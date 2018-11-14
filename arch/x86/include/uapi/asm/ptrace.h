@@ -46,6 +46,7 @@ struct pt_regs {
  * C ABI says these regs are callee-preserved. They aren't saved on kernel entry
  * unless syscall needs a complete, fully filled "struct pt_regs".
  */
+	unsigned long secure;
 	unsigned long r15;
 	unsigned long r14;
 	unsigned long r13;

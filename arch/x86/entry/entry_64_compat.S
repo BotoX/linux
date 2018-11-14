@@ -104,6 +104,7 @@ ENTRY(entry_SYSENTER_compat)
 	xorl	%r14d, %r14d		/* nospec   r14 */
 	pushq   $0			/* pt_regs->r15 = 0 */
 	xorl	%r15d, %r15d		/* nospec   r15 */
+	pushq   $0			/* pt_regs->secure = 0 */
 	cld
 
 	/*
@@ -246,6 +247,7 @@ GLOBAL(entry_SYSCALL_compat_after_hwframe)
 	xorl	%r14d, %r14d		/* nospec   r14 */
 	pushq   $0			/* pt_regs->r15 = 0 */
 	xorl	%r15d, %r15d		/* nospec   r15 */
+	pushq   $0			/* pt_regs->secure = 0 */
 
 	/*
 	 * User mode is traced as though IRQs are on, and SYSENTER
@@ -394,6 +396,7 @@ ENTRY(entry_INT80_compat)
 	xorl	%r14d, %r14d		/* nospec   r14 */
 	pushq   %r15                    /* pt_regs->r15 */
 	xorl	%r15d, %r15d		/* nospec   r15 */
+	pushq	$0			/* pt_regs->secure (todo?) */
 	cld
 
 	/*

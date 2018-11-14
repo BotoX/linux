@@ -67,35 +67,36 @@ For 32-bit we have the following conventions - kernel is built with
  * C ABI says these regs are callee-preserved. They aren't saved on kernel entry
  * unless syscall needs a complete, fully filled "struct pt_regs".
  */
-#define R15		0*8
-#define R14		1*8
-#define R13		2*8
-#define R12		3*8
-#define RBP		4*8
-#define RBX		5*8
+#define SECURE		0*8
+#define R15		1*8
+#define R14		2*8
+#define R13		3*8
+#define R12		4*8
+#define RBP		5*8
+#define RBX		6*8
 /* These regs are callee-clobbered. Always saved on kernel entry. */
-#define R11		6*8
-#define R10		7*8
-#define R9		8*8
-#define R8		9*8
-#define RAX		10*8
-#define RCX		11*8
-#define RDX		12*8
-#define RSI		13*8
-#define RDI		14*8
+#define R11		7*8
+#define R10		8*8
+#define R9		9*8
+#define R8		10*8
+#define RAX		11*8
+#define RCX		12*8
+#define RDX		13*8
+#define RSI		14*8
+#define RDI		15*8
 /*
  * On syscall entry, this is syscall#. On CPU exception, this is error code.
  * On hw interrupt, it's IRQ number:
  */
-#define ORIG_RAX	15*8
+#define ORIG_RAX	16*8
 /* Return frame for iretq */
-#define RIP		16*8
-#define CS		17*8
-#define EFLAGS		18*8
-#define RSP		19*8
-#define SS		20*8
+#define RIP		17*8
+#define CS		18*8
+#define EFLAGS		19*8
+#define RSP		20*8
+#define SS		21*8
 
-#define SIZEOF_PTREGS	21*8
+#define SIZEOF_PTREGS	22*8
 
 .macro PUSH_AND_CLEAR_REGS rdx=%rdx rax=%rax save_ret=0
 	/*
@@ -138,6 +139,13 @@ For 32-bit we have the following conventions - kernel is built with
 	xorl	%r14d, %r14d	/* nospec   r14*/
 	pushq	%r15		/* pt_regs->r15 */
 	xorl	%r15d, %r15d	/* nospec   r15*/
+
+	movq	%rax, %r8
+	movl	$MSR_NTR, %ecx
+	rdmsr
+	pushq	%rax		/* pt_regs->secure */
+	movq	%r8, %rax
+
 	UNWIND_HINT_REGS
 	.if \save_ret
 	pushq	%rsi		/* return address on top of stack */
@@ -145,6 +153,17 @@ For 32-bit we have the following conventions - kernel is built with
 .endm
 
 .macro POP_REGS pop_rdi=1 skip_r11rcx=0
+	popq %rax
+	xorl %edx, %edx
+	.if \skip_r11rcx
+	movq %rcx, %r15
+	.endif
+	movl $MSR_NTR, %ecx
+	wrmsr
+	.if \skip_r11rcx
+	movq %r15, %rcx
+	.endif
+
 	popq %r15
 	popq %r14
 	popq %r13

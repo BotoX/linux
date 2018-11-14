@@ -318,6 +318,7 @@ early_idt_handler_common:
 	pushq %r13				/* pt_regs->r13 */
 	pushq %r14				/* pt_regs->r14 */
 	pushq %r15				/* pt_regs->r15 */
+	pushq $0				/* pt_regs->secure (todo?) */
 	UNWIND_HINT_REGS
 
 	cmpq $14,%rsi		/* Page fault? */

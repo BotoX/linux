@@ -62,6 +62,7 @@ struct pt_regs_offset {
 
 static const struct pt_regs_offset regoffset_table[] = {
 #ifdef CONFIG_X86_64
+	REG_OFFSET_NAME(secure),
 	REG_OFFSET_NAME(r15),
 	REG_OFFSET_NAME(r14),
 	REG_OFFSET_NAME(r13),
@@ -248,8 +249,8 @@ static int set_segment_reg(struct task_struct *task,
 
 static unsigned long *pt_regs_access(struct pt_regs *regs, unsigned long offset)
 {
-	BUILD_BUG_ON(offsetof(struct pt_regs, r15) != 0);
-	return &regs->r15 + (offset / sizeof(regs->r15));
+	BUILD_BUG_ON(offsetof(struct pt_regs, secure) != 0);
+	return &regs->secure + (offset / sizeof(regs->secure));
 }
 
 static u16 get_segment_reg(struct task_struct *task, unsigned long offset)

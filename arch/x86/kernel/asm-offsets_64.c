@@ -50,6 +50,7 @@ int main(void)
 	ENTRY(r13);
 	ENTRY(r14);
 	ENTRY(r15);
+	ENTRY(secure);
 	ENTRY(flags);
 	BLANK();
 #undef ENTRY
